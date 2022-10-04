@@ -1,0 +1,4 @@
+pyserial==3.4
+opencv-contrib-python
+numpy
+streamlit
