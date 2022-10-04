@@ -1,3 +1,10 @@
+"""
+xArm SDK Test with OpenCV
+
+This is a program to test the Python SDK of xArm using computer vision application.
+Full credit of xArm Python SDK goes to : https://github.com/xArm-Developer/xArm-Python-SDK
+
+"""
 import numpy as np
 import cv2,time,glob,os
 from cameraLogitech import CameraSetup
