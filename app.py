@@ -109,7 +109,6 @@ def draw_and_move(camera,x_arm, webcam_frame):
 
 def start_webcam_stream(image_frame):
     stop_button = st.button("Stop Process")
-    ret, frame, dst = None, None, None #Preallocate variables
     while webcam.isOpened():
         ret, frame = webcam.read()
         if not ret:
@@ -121,7 +120,7 @@ def start_webcam_stream(image_frame):
         dst = cv2.cvtColor(dst,cv2.COLOR_BGR2RGB)
         image_frame.image(dst,clamp=True)
         dst, frame = None, None     #clear dst and frame np
-        del dst, frame
+        del dst, frame  #delete the variables
         gc.collect()    #garbage collector to free unallocated space
         if stop_button:
             webcam.release()
