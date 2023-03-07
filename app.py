@@ -6,7 +6,7 @@ Full credit of xArm Python SDK goes to : https://github.com/xArm-Developer/xArm-
 
 """
 import numpy as np
-import cv2,time,glob,os
+import cv2,time,glob,os,gc
 from cameraLogitech import CameraSetup
 from xarm.wrapper import XArmAPI
 import streamlit as st
@@ -105,17 +105,21 @@ def draw_and_move(camera,x_arm, webcam_frame):
                 #Move robot to new position
                 x_arm.set_position(x=x_arm.position[0]+move_distance[0],y=x_arm.position[1]+move_distance[1],speed=speed,mvacc=mvacc,relative=False,wait=False)
                 # time.sleep(0.3)
-
+    #Delete Numpy array and use gc to release memory            
+    del image_np
+    gc.collect()
     return dst
 
-def start_webcam_stream():
+def start_webcam_stream(image_frame):
     stop_button = st.button("Stop Process")
+    ret, frame, dst = None, None, None #Preallocate variables
     while webcam.isOpened():
         ret, frame = webcam.read()
         if not ret:
             break
         
         dst = draw_and_move(cam,arm,frame)
+        gc.collect()    #garbage collector to free unallocated space
         #Show image
         dst = cv2.cvtColor(dst,cv2.COLOR_BGR2RGB)
         image_frame.image(dst,clamp=True)
@@ -136,7 +140,7 @@ if start_button:
 
     image_frame = st.image(placeholder_img,channels='BGR',clamp=True)
 
-    start_webcam_stream()
+    start_webcam_stream(image_frame)
 
 # else:
     # webcam.release()
