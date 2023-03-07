@@ -108,8 +108,8 @@ def draw_and_move(camera,x_arm, webcam_frame):
                 # time.sleep(0.3)        
     return dst
 
-@st.cache_data      #Add streamlit data cache
-def start_webcam_stream(image_frame):
+@st.cache_resource      #Add streamlit resource cache
+def start_webcam_stream(_image_frame):
     stop_button = st.button("Stop Process")
     while webcam.isOpened():
         ret, frame = webcam.read()
@@ -120,7 +120,7 @@ def start_webcam_stream(image_frame):
         
         #Show image
         dst = cv2.cvtColor(dst,cv2.COLOR_BGR2RGB)
-        image_frame.image(dst,clamp=True)
+        _image_frame.image(dst,clamp=True)
         dst, frame = None, None     #clear dst and frame np
         del dst, frame  #delete the variables
         if stop_button:
