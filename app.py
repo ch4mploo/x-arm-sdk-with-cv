@@ -104,10 +104,7 @@ def draw_and_move(camera,x_arm, webcam_frame):
                 move_distance = (np.flip(xy_distance_mm)).flatten() * -1
                 #Move robot to new position
                 x_arm.set_position(x=x_arm.position[0]+move_distance[0],y=x_arm.position[1]+move_distance[1],speed=speed,mvacc=mvacc,relative=False,wait=False)
-                # time.sleep(0.3)
-    #Delete Numpy array and use gc to release memory            
-    del image_np
-    gc.collect()
+                # time.sleep(0.3)        
     return dst
 
 def start_webcam_stream(image_frame):
@@ -119,10 +116,12 @@ def start_webcam_stream(image_frame):
             break
         
         dst = draw_and_move(cam,arm,frame)
-        gc.collect()    #garbage collector to free unallocated space
+        
         #Show image
         dst = cv2.cvtColor(dst,cv2.COLOR_BGR2RGB)
         image_frame.image(dst,clamp=True)
+        dst, frame = None, None     #clear dst and frame np
+        gc.collect()    #garbage collector to free unallocated space
         if stop_button:
             webcam.release()
             arm.disconnect()
