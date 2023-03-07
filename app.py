@@ -121,6 +121,7 @@ def start_webcam_stream(image_frame):
         dst = cv2.cvtColor(dst,cv2.COLOR_BGR2RGB)
         image_frame.image(dst,clamp=True)
         dst, frame = None, None     #clear dst and frame np
+        del dst, frame
         gc.collect()    #garbage collector to free unallocated space
         if stop_button:
             webcam.release()
