@@ -121,10 +121,10 @@ def start_webcam_stream(image_frame):
         image_frame.image(dst,clamp=True)
         dst, frame = None, None     #clear dst and frame np
         del dst, frame  #delete the variables
-        gc.collect()    #garbage collector to free unallocated space
         if stop_button:
             webcam.release()
             arm.disconnect()
+            gc.collect()    #garbage collector to free unallocated space
             break
 
 st.header('3. Start the process')
