@@ -108,7 +108,7 @@ def draw_and_move(camera,x_arm, webcam_frame):
                 # time.sleep(0.3)        
     return dst
 
-@st.cache_resource      #Add streamlit resource cache
+#@st.cache_resource      #Add streamlit resource cache
 def start_webcam_stream(_image_frame):
     stop_button = st.button("Stop Process")
     while webcam.isOpened():
