@@ -54,10 +54,10 @@ if not (webcam.isOpened()):
     st.stop()
 
 @st.cache_data      #Add streamlit data cache
-def draw_and_move(camera,x_arm, webcam_frame):
+def draw_and_move(_camera,_x_arm, _webcam_frame):
     #Convert the frame into numpy array
-    image_np = np.array(webcam_frame)
-    dst = camera.undistortAndCrop(image_np)
+    image_np = np.array(_webcam_frame)
+    dst = _camera.undistortAndCrop(image_np)
     #Obtain marker corners
     _, _, corners = cv2.aruco.detectMarkers(dst, aruco_dict, parameters=parameters)
 
@@ -104,7 +104,7 @@ def draw_and_move(camera,x_arm, webcam_frame):
                 #Compute distance to move for robot arm
                 move_distance = (np.flip(xy_distance_mm)).flatten() * -1
                 #Move robot to new position
-                x_arm.set_position(x=x_arm.position[0]+move_distance[0],y=x_arm.position[1]+move_distance[1],speed=speed,mvacc=mvacc,relative=False,wait=False)
+                _x_arm.set_position(x=_x_arm.position[0]+move_distance[0],y=_x_arm.position[1]+move_distance[1],speed=speed,mvacc=mvacc,relative=False,wait=False)
                 # time.sleep(0.3)        
     return dst
 
