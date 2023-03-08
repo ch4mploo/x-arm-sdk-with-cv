@@ -109,7 +109,7 @@ def draw_and_move(_camera,_x_arm, _webcam_frame):
     return dst
 
 #@st.cache_resource      #Add streamlit resource cache
-def start_webcam_stream(_image_frame):
+def start_webcam_stream(_image_frame,arm):
     stop_button = st.button("Stop Process")
     while webcam.isOpened():
         ret, frame = webcam.read()
@@ -141,7 +141,7 @@ if start_button:
 
     image_frame = st.image(placeholder_img,channels='BGR',clamp=True)
 
-    start_webcam_stream(image_frame)
+    start_webcam_stream(image_frame,arm)
 
 # else:
     # webcam.release()
