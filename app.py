@@ -10,6 +10,8 @@ import cv2,time,glob,os,gc
 from cameraLogitech import CameraSetup
 from xarm.wrapper import XArmAPI
 import streamlit as st
+from memory_profiler import profile
+from trace_memory import TraceMemory
 
 st.title("Aruco Marker Tracker")
 st.header("1. Fine tune Aruco marker detector parameters")
@@ -53,10 +55,10 @@ if not (webcam.isOpened()):
     st.error('Webcam not detected')
     st.stop()
 
-@st.cache_data      #Add streamlit data cache
-def draw_and_move(_camera,_x_arm, _webcam_frame):
+@st.cache_data(ttl=600,max_entries=200)      #Add streamlit data cache
+def draw_and_move(_camera,_x_arm, webcam_frame):
     #Convert the frame into numpy array
-    image_np = np.array(_webcam_frame)
+    image_np = np.array(webcam_frame)
     dst = _camera.undistortAndCrop(image_np)
     #Obtain marker corners
     _, _, corners = cv2.aruco.detectMarkers(dst, aruco_dict, parameters=parameters)
@@ -105,33 +107,37 @@ def draw_and_move(_camera,_x_arm, _webcam_frame):
                 move_distance = (np.flip(xy_distance_mm)).flatten() * -1
                 #Move robot to new position
                 _x_arm.set_position(x=_x_arm.position[0]+move_distance[0],y=_x_arm.position[1]+move_distance[1],speed=speed,mvacc=mvacc,relative=False,wait=False)
-                # time.sleep(0.3)        
+                # time.sleep(0.3)
+        del int_corners, marker_center, image_center, xy_distance, aruco_perimeter, mm2pixel, xy_distance_mm, displacement
+    del image_np, corners        
     return dst
 
 #@st.cache_resource      #Add streamlit resource cache
-def start_webcam_stream(_image_frame,arm):
+@profile
+def start_webcam_stream(_image_frame,xarm):
     stop_button = st.button("Stop Process")
     while webcam.isOpened():
         ret, frame = webcam.read()
         if not ret:
             break
         
-        dst = draw_and_move(cam,arm,frame)
+        dst = draw_and_move(cam,xarm,frame)
         
         #Show image
         dst = cv2.cvtColor(dst,cv2.COLOR_BGR2RGB)
         _image_frame.image(dst,clamp=True)
-        dst, frame = None, None     #clear dst and frame np
-        del dst, frame  #delete the variables
+        ret, dst, frame = None, None, None     #clear dst and frame np
+        del ret, dst, frame  #delete the variables
         if stop_button:
             webcam.release()
-            arm.disconnect()
-            gc.collect()    #garbage collector to free unallocated space
+            xarm.disconnect()
             break
 
 st.header('3. Start the process')
 placeholder_img = cv2.imread(r".\aruco_test\no_aruco.jpg")
 start_button = st.button("Connect xArm and start camera")
+# tracer = TraceMemory()
+# tracer._init_tracking_object()
 if start_button:
     arm = XArmAPI(robot_ip,is_radian=False)
     arm.motion_enable(enable=True)
@@ -142,6 +148,8 @@ if start_button:
     image_frame = st.image(placeholder_img,channels='BGR',clamp=True)
 
     start_webcam_stream(image_frame,arm)
+gc.collect()        #Garbage collection before snapshot
+# tracer.compare_snapshots()
 
 # else:
     # webcam.release()
