@@ -10,7 +10,7 @@ https://github.com/xArm-Developer/xArm-Python-SDK
 This project uses Python version 3.8.13
 ```
 pyserial==3.4
-opencv-contrib-python
+opencv-contrib-python==4.6.0.66
 numpy
 streamlit
 ```
